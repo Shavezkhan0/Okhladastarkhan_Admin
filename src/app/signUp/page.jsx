@@ -7,6 +7,8 @@ import { useForm } from "react-hook-form";
 import Toastify from 'toastify-js';
 import "toastify-js/src/toastify.css";
 import { BiShow, BiHide } from "react-icons/bi";
+import LoadingBar from "react-top-loading-bar";
+import LoadingBar from "react-top-loading-bar";
 
 
 const SignUp = () => {
@@ -14,6 +16,7 @@ const SignUp = () => {
     const { data: session, status: sessionStatus } = useSession()
     const route = useRouter()
     const [showpassword, setshowpassword] = useState(false)
+    const [progress, setProgress] = useState(0);
 
 
     useEffect(() => {
@@ -31,7 +34,7 @@ const SignUp = () => {
     } = useForm()
 
     const onSubmit = async (data) => {
-
+        setProgress(30);
         try {
             const response = await fetch("/api/user/signup", {
                 method: "POST",
@@ -40,9 +43,10 @@ const SignUp = () => {
                 },
                 body: JSON.stringify(data),
             })
+            setProgress(60);
 
             const res = await response.json()
-
+            setProgress(80);
             if (res.success === false) {
                 Toastify({
                     text: `${res.message}`,
@@ -54,7 +58,7 @@ const SignUp = () => {
                 }).showToast();
             }
 
-
+            setProgress(90);
             if (res.success === true) {
                 Toastify({
                     text: `${res.message}`,
@@ -64,6 +68,7 @@ const SignUp = () => {
                     position: "right", // `left`, `center` or `right`
                     style: { background: "linear-gradient(to right, #00b09b, #96c93d)" },
                 }).showToast();
+                setProgress(100);
                 setTimeout(() => {
                     route.push('/login')
                 }, 500);
@@ -85,69 +90,80 @@ const SignUp = () => {
 
     }
     return (
-        <div className='mx-auto mt-4' >
-            <div className='flex flex-col justify-center items-center w-[95vw] md:w-[50vw] mx-auto border-2 shadow-md py-5 px-5'>
-                <h1 className='text-2xl font-bold text-[#8122a1] pb-3'>SignUp</h1>
-                <div>
-                    <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-2 '>
+        <>
+            <LoadingBar
+                color="#f11946"
+                progress={progress}
+                waitingTime={2000}
+                onLoaderFinished={() => {
+                    console.log("Loader finished");
+                    setProgress(0);
+                }}
+            />
+            <div className='mx-auto mt-4' >
+                <div className='flex flex-col justify-center items-center w-[95vw] md:w-[50vw] mx-auto border-2 shadow-md py-5 px-5'>
+                    <h1 className='text-2xl font-bold text-[#8122a1] pb-3'>SignUp</h1>
+                    <div>
+                        <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-2 '>
 
-                        <div className='flex flex-col  justify-center items-center py-2'>
+                            <div className='flex flex-col  justify-center items-center py-2'>
 
 
-                            <div className='flex flex-col  justify-center items-center  gap-2  '>
+                                <div className='flex flex-col  justify-center items-center  gap-2  '>
 
-                                <div className='w-full flex  gap-2 items-center justify-between'>
-                                    <label className=''>Name</label>
-                                    <input type="text" className='bg-gray-200 bottom-2 border-black rounded-sm px-2 py-1' placeholder='Enter Shop Name' {...register("username")} autoComplete="username" />
-                                </div>
-
-
-
-                                <div className='w-full flex gap-2  items-center justify-between'>
-                                    <label className=''>Email</label>
-                                    <input type="email" className='bg-gray-200 bottom-2 border-black rounded-sm px-2 py-1' placeholder='Enter your email' {...register("email")} autoComplete="email" />
-                                </div>
-
-                                <div className='w-full flex  gap-2 items-center justify-between'>
-                                    <label className=''>Phone Number</label>
-                                    <input type="text" className='bg-gray-200 bottom-2 border-black rounded-sm px-2 py-1' placeholder='Enter your phone number' {...register("phoneNumber")} autoComplete="phoneNumber" />
-                                </div>
-
-                                <div className='w-full flex  gap-2 items-center justify-between'>
-                                    <label className=''>Password</label>
-                                    <div className='relative'>
-                                        <input type={showpassword ? 'text' : "password"} className='bg-gray-200 w-full bottom-2 border-black rounded-sm px-2 py-1' placeholder='Enter password' {...register("password")} autoComplete="password" />
-                                        {showpassword ? (
-                                            <BiHide onClick={() => setshowpassword(false)} className='absolute top-1/2 right-2 transform -translate-y-1/2 cursor-pointer' size={20} />
-                                        ) : (
-                                            <BiShow onClick={() => setshowpassword(true)} className='absolute top-1/2 right-2 transform -translate-y-1/2 cursor-pointer' size={20} />
-                                        )}
+                                    <div className='w-full flex  gap-2 items-center justify-between'>
+                                        <label className=''>Name</label>
+                                        <input type="text" className='bg-gray-200 bottom-2 border-black rounded-sm px-2 py-1' placeholder='Enter Shop Name' {...register("username")} autoComplete="username" />
                                     </div>
+
+
+
+                                    <div className='w-full flex gap-2  items-center justify-between'>
+                                        <label className=''>Email</label>
+                                        <input type="email" className='bg-gray-200 bottom-2 border-black rounded-sm px-2 py-1' placeholder='Enter your email' {...register("email")} autoComplete="email" />
+                                    </div>
+
+                                    <div className='w-full flex  gap-2 items-center justify-between'>
+                                        <label className=''>Phone Number</label>
+                                        <input type="text" className='bg-gray-200 bottom-2 border-black rounded-sm px-2 py-1' placeholder='Enter your phone number' {...register("phoneNumber")} autoComplete="phoneNumber" />
+                                    </div>
+
+                                    <div className='w-full flex  gap-2 items-center justify-between'>
+                                        <label className=''>Password</label>
+                                        <div className='relative'>
+                                            <input type={showpassword ? 'text' : "password"} className='bg-gray-200 w-full bottom-2 border-black rounded-sm px-2 py-1' placeholder='Enter password' {...register("password")} autoComplete="password" />
+                                            {showpassword ? (
+                                                <BiHide onClick={() => setshowpassword(false)} className='absolute top-1/2 right-2 transform -translate-y-1/2 cursor-pointer' size={20} />
+                                            ) : (
+                                                <BiShow onClick={() => setshowpassword(true)} className='absolute top-1/2 right-2 transform -translate-y-1/2 cursor-pointer' size={20} />
+                                            )}
+                                        </div>
+                                    </div>
+
+
+
                                 </div>
 
 
-
+                            </div>
+                            <div className="flex justify-center items-center">
+                                <button type='submit' className="w-fit text-center mt-2 gap-2 font-semibold text-black bg-[#b161cc] border-0 py-2 px-5 md:px-6 focus:outline-none hover:bg-[#822b9f] rounded text-sm md:text-base">SignUp</button>
                             </div>
 
-
-                        </div>
-                        <div className="flex justify-center items-center">
-                            <button type='submit' className="w-fit text-center mt-2 gap-2 font-semibold text-black bg-[#b161cc] border-0 py-2 px-5 md:px-6 focus:outline-none hover:bg-[#822b9f] rounded text-sm md:text-base">SignUp</button>
-                        </div>
-
-                        <div className="flex flex-col gap-2 justify-between items-center">
-                            <div >
-                                <Link href={'/login'}>
-                                    <h1 className='text-lg font-semibold hover:text-[#74288d] text-[#a347c1] cursor-pointer'>Login</h1>
-                                </Link>
+                            <div className="flex flex-col gap-2 justify-between items-center">
+                                <div >
+                                    <Link href={'/login'}>
+                                        <h1 className='text-lg font-semibold hover:text-[#74288d] text-[#a347c1] cursor-pointer'>Login</h1>
+                                    </Link>
+                                </div>
                             </div>
-                        </div>
 
-                    </form>
+                        </form>
 
+                    </div>
                 </div>
             </div>
-        </div>
+        </>
     )
 }
 
